@@ -1,4 +1,4 @@
-# :rocket: SpaceX Launch Analysis & Booster Landing Prediction
+#SpaceX Launch Analysis & Booster Landing Prediction
 
 A complete data science project that explores and models Falcon 9 rocket launches to predict **booster landing success**.
 
