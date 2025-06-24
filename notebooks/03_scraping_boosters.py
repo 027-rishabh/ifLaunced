@@ -1,52 +1,45 @@
-# Scrape Falcon 9 Booster Info from Wikipedia
-
-#In this notebook, we scrape the Falcon 9 booster launch table from Wikipedia to extract extra metadata like:
-#- Booster version and block
-#- Reused/refurbished status
-#- Landing type and outcome
-
 import requests
-import pandas as pd
 from bs4 import BeautifulSoup
+import pandas as pd
 
-URL = "https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches"
-
-response = requests.get(URL)
-soup = BeautifulSoup(response.content, "lxml")
-
-tables = soup.find_all("table", class_="wikitable")
-
-print(f"Total tables found: {len(tables)}")
-
-booster_data = []
-
-for table in tables[:10]:  # Looping through the first 10 years (2010–2020)
-    rows = table.find_all("tr")[1:]  # Skip header row
-    for row in rows:
-        cols = row.find_all("td")
-        if len(cols) >= 8:  # Make sure row has enough columns
-            booster_data.append([
-                cols[0].text.strip(),  # Date
-                cols[1].text.strip(),  # Booster
-                cols[2].text.strip(),  # Launch Site
-                cols[3].text.strip(),  # Payload
-                cols[4].text.strip(),  # Orbit
-                cols[5].text.strip(),  # Customer
-                cols[6].text.strip(),  # Launch Outcome
-                cols[7].text.strip(),  # Landing Type
-                cols[8].text.strip() if len(cols) > 8 else None  # Landing Outcome
-            ])
-
-columns = [
-    'date', 'booster_version', 'launch_site',
-    'payload', 'orbit', 'customer',
-    'launch_outcome', 'landing_type', 'landing_outcome'
+# ---- 1. Define the two URLs ----
+urls = [
+    "https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches_(2010%E2%80%932019)",
+    "https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches_(2020%E2%80%932022)"
 ]
 
-booster_df = pd.DataFrame(booster_data, columns=columns)
+# ---- 2. Initialize list to hold rows ----
+all_launches = []
 
-booster_df.head()
+# ---- 3. Loop through both URLs ----
+for url in urls:
+    res = requests.get(url)
+    soup = BeautifulSoup(res.content, "lxml")
+    tables = soup.find_all("table", class_="wikitable")
 
-booster_df.to_csv('../data/raw/wiki_booster_data.csv', index=False)
-print("Scraped booster data saved to ../data/raw/wiki_booster_data.csv")
+    print(f"Scraping {url} → Found {len(tables)} tables")
+
+    for table in tables:
+        for row in table.find_all("tr")[1:]:  # skip header
+            cols = row.find_all("td")
+            if len(cols) >= 8:
+                launch = {
+                    "date": cols[0].text.strip(),
+                    "booster_version": cols[1].text.strip(),
+                    "launch_site": cols[2].text.strip(),
+                    "payload": cols[3].text.strip(),
+                    "orbit": cols[4].text.strip(),
+                    "customer": cols[5].text.strip(),
+                    "launch_outcome": cols[6].text.strip(),
+                    "landing_type": cols[7].text.strip(),
+                    "landing_outcome": cols[8].text.strip() if len(cols) > 8 else None,
+                }
+                all_launches.append(launch)
+
+# ---- 4. Convert to DataFrame ----
+df = pd.DataFrame(all_launches)
+
+# ---- 5. Save to CSV ----
+df.to_csv("../data/raw/wiki_booster_data.csv", index=False)
+print(f"✅ Scraped total {len(df)} rows and saved to wiki_booster_data.csv")
 

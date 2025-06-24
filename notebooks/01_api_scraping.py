@@ -7,7 +7,7 @@ import pandas as pd
 import json
 
 # SpaceX API URL
-spacex_url = 'https://api.spacexdata.com/v4/launches/past'
+spacex_url = 'https://api.spacexdata.com/v5/launches/'
 
 # Fetch data
 response = requests.get(spacex_url)
