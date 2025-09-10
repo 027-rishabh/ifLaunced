@@ -41,5 +41,5 @@ df = pd.DataFrame(all_launches)
 
 # ---- 5. Save to CSV ----
 df.to_csv("../data/raw/wiki_booster_data.csv", index=False)
-print(f"✅ Scraped total {len(df)} rows and saved to wiki_booster_data.csv")
+print(f"Scraped total {len(df)} rows and saved to wiki_booster_data.csv")
 
