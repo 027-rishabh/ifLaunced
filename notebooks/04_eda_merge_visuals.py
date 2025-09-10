@@ -31,14 +31,14 @@ wiki_df = wiki_df.dropna(subset=['date'])
 # -----------------------------
 # 3. Print Sample & Range Check
 # -----------------------------
-print("\n📅 Sample parsed dates (wiki):")
+print("\nSample parsed dates (wiki):")
 print(wiki_df['date'].dropna().head())
 
-print("\n📅 Sample parsed dates (api):")
+print("\nSample parsed dates (api):")
 print(api_df['launch_date'].dropna().head())
 
-print("\n📆 API date range:", api_df['launch_date'].min(), "to", api_df['launch_date'].max())
-print("📆 Wiki date range:", wiki_df['date'].min(), "to", wiki_df['date'].max())
+print("\nAPI date range:", api_df['launch_date'].min(), "to", api_df['launch_date'].max())
+print("Wiki date range:", wiki_df['date'].min(), "to", wiki_df['date'].max())
 
 # -----------------------------
 # 4. Sort and Merge (±30 days)
@@ -60,8 +60,8 @@ merged = merged.dropna(subset=['booster_version'])
 
 # Save merged result
 merged.to_csv("../data/processed/spacex_enriched.csv", index=False)
-print(f"\n✅ Merged rows: {merged.shape[0]}")
-print("📁 Saved to ../data/processed/spacex_enriched.csv")
+print(f"\nMerged rows: {merged.shape[0]}")
+print("Saved to ../data/processed/spacex_enriched.csv")
 
 # -----------------------------
 # 5. EDA if Merge Worked
@@ -115,5 +115,5 @@ if not merged.empty:
     plt.tight_layout()
     plt.show()
 else:
-    print("\n⚠️ No merged rows found — adjust date parsing or verify date ranges.")
+    print("\nNo merged rows found — adjust date parsing or verify date ranges.")
 
