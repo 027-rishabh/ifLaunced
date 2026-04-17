@@ -1,6 +1,27 @@
+# Data Collection
 requests
-pandas
 beautifulsoup4
-requests
-plotly
 lxml
+
+# Data Processing
+pandas
+numpy
+
+# Visualization
+plotly
+matplotlib
+seaborn
+
+# Machine Learning
+scikit-learn
+xgboost
+shap
+
+# Model Persistence
+joblib
+
+# API Deployment
+fastapi
+uvicorn
+pydantic
+python-multipart
