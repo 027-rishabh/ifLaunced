@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 from bs4 import BeautifulSoup
 from pathlib import Path
+import ast
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -53,13 +54,12 @@ df_clean['launch_date'] = pd.to_datetime(df['date_utc'])
 df_clean['rocket_name'] = df['rocket']  # Rocket ID
 df_clean['launch_site'] = df['launchpad']
 
-# Extract payload mass from payloads (it's a list in JSON string)
-def get_payload_mass(payloads_str):
+# Extract payload mass from payloads
+def get_payload_mass(payloads):
     try:
-        import json
-        payloads = json.loads(payloads_str)
-        if isinstance(payloads, list) and len(payloads) > 0:
-            return payloads[0].get('mass_kg', None)
+        payloads_list = payloads if isinstance(payloads, list) else ast.literal_eval(payloads)
+        if isinstance(payloads_list, list) and len(payloads_list) > 0:
+            return payloads_list[0].get('mass_kg', None)
     except:
         pass
     return None
@@ -67,12 +67,11 @@ def get_payload_mass(payloads_str):
 df_clean['payload_mass'] = df['payloads'].apply(get_payload_mass)
 
 # Extract orbit from payloads
-def get_orbit(payloads_str):
+def get_orbit(payloads):
     try:
-        import json
-        payloads = json.loads(payloads_str)
-        if isinstance(payloads, list) and len(payloads) > 0:
-            return payloads[0].get('orbit', None)
+        payloads_list = payloads if isinstance(payloads, list) else ast.literal_eval(payloads)
+        if isinstance(payloads_list, list) and len(payloads_list) > 0:
+            return payloads_list[0].get('orbit', None)
     except:
         pass
     return None
@@ -81,19 +80,16 @@ df_clean['orbit'] = df['payloads'].apply(get_orbit)
 
 # Extract landing success from cores
 def extract_landing_success(cores):
-    if pd.isna(cores):
+    if cores is None or (isinstance(cores, float) and pd.isna(cores)):
         return None
     try:
-        if isinstance(cores, str):
-            import json
-            cores = json.loads(cores)
-        if isinstance(cores, list) and len(cores) > 0:
-            return cores[0].get('landing_success', None)
+        cores_list = cores if isinstance(cores, list) else ast.literal_eval(cores)
+        if isinstance(cores_list, list) and len(cores_list) > 0:
+            return cores_list[0].get('landing_success', None)
     except:
         return None
 
 df_clean['landing_success'] = df['cores'].apply(extract_landing_success)
-df_clean['reused'] = df['cores'].apply(lambda x: x[0].get('reused', None) if isinstance(x, list) and len(x) > 0 else None)
 
 # Drop rows with missing landing success
 df_clean = df_clean.dropna(subset=['landing_success'])
